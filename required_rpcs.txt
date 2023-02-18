@@ -1,0 +1,259 @@
+service AcquisitionService {
+    // Returns current acquisition run info and streams any changes to the current acquisition
+    //
+    // This call can be made even if acquisition is not running. In this case, the next streamed
+    // response will be the start of a new acquisition and you will receive updates for that acquisition
+    // until it finishes.
+    //
+    // If an acquisition finishes this stream will still continue to run and you will be notified when a new acquisition starts.
+    //
+    // Note if you begin this stream before any acquisition is started in minknow the state is `ACQUISITION_COMPLETED`.
+    //
+    // Since 1.13
+    rpc watch_current_acquisition_run (WatchCurrentAcquisitionRunRequest) returns (stream AcquisitionRunInfo) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Check the current status of MinKNOW.
+    rpc current_status (CurrentStatusRequest) returns (CurrentStatusResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Information on how much data has been acquired, processed and written.
+    rpc get_progress (GetProgressRequest) returns (GetProgressResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+        // Returns the name and run id of the currently running acquisition.
+    //
+    // Will fail with FAILED_PRECONDITION if there is no acquisition running
+    //
+    // Since 1.11
+    rpc get_current_acquisition_run (GetCurrentAcquisitionRunRequest) returns (AcquisitionRunInfo) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+}
+
+service AnalysisConfigurationService {
+
+    // Get a map of read classifications mapped to id (used internally in analysis).
+    //
+    // This will change when the analysis configuration changes.
+    rpc get_read_classifications (GetReadClassificationsRequest) returns (GetReadClassificationsResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    };
+
+}
+
+
+service DataService {
+    // Get live reads sent in order to control sequencing behaviour.
+    //
+    // This method sends current reads (reads that are currently in the sequencer) to the user along
+    // with live analysis data in order for real time decisions to be made.
+    //
+    // The method provides two streams:
+    //
+    // GetLiveReadsRequest stream:
+    //      Sent by the user, provides MinKNOW with actions to take on current reads, actions
+    //      taken are sumarised and sent back to the user in the GetLiveReadsResponse stream.
+    // GetLiveReadsResponse stream:
+    //      Sent to the user, contains a stream of ongoing sequencing information, sent as
+    //      regularly as possible, with information on reads in progress, and feedback on actions
+    //      taken on the data.
+    //
+    // note: This method operates on read chunks in MinKNOW, and will send at minimum, 1 read
+    // chunk to the user. In order to reduce latency on the method, tune the following options:
+    //
+    // The raw chunk size data is processed in minknow (specified in samples):
+    //      app_conf/hyperstream.raw_data_intermediate.size
+    //      app_conf/hyperstream.raw_meta_data_intermediate.size
+    //
+    // The maximum read chunk size - changing the size read chunks are processed in minknow:
+    //      analysis_conf/read_detection.break_reads_after_seconds
+    //
+    rpc get_live_reads(stream GetLiveReadsRequest) returns (stream GetLiveReadsResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+
+    // Get the data types of data items produced by this service.
+    //
+    // In order to allow clients to efficiently deal with large volumes of data in languages such as
+    // Python, this service can provide data as raw bytes. This call can be used to determine how to
+    // interpret those bytes. This can be used to construct an appropriate numpy dtype, for example.
+    rpc get_data_types (GetDataTypesRequest) returns (GetDataTypesResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+}
+
+service DeviceService {
+    // Get information about the flow cell (if any).
+    //
+    // This provides information about the flow_cell attached to the device (described by
+    // get_device_info()), if any.
+    rpc get_flow_cell_info (GetFlowCellInfoRequest) returns (GetFlowCellInfoResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // The calibration measurements being used by MinKNOW.
+    //
+    // Calibration describes how to convert from the raw ADC (analog-to-digital converter) values
+    // from the device into picoamps (pA).
+    //
+    // To get a pA value from an ADC value the following function is applied::
+    //
+    //      pA_current = (adc_current + offset) / (digitisation / pA_range)
+    //
+    // The digitisation is the range of possible ADC values. It is the same for all channels.
+    //
+    // If there is no calibration (including if it was cleared with ``clear_calibration()`` or
+    // invalidated because of device settings changes), this will return the identity calibration:
+    // all offsets will be 0, and the pA ranges will be the same as the digitisation.
+    rpc get_calibration (GetCalibrationRequest) returns (GetCalibrationResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+}
+
+service InstanceService {
+    // Current version information includes:
+    // - Minknow version
+    // - Protocols version
+    // - Distribution version
+    rpc get_version_info (GetVersionInfoRequest) returns (GetVersionInfoResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+}
+
+// Allows arbitrary data to be associated with this MinKNOW instance.
+//
+// This can be used by the protocol to communicate information to the outside world (including a
+// user interface), for example.
+//
+// Value names should be stored in the form <product>:<name>, where <product> is the name of the
+// product that has decided what form the value should take (generally either the software that is
+// setting the value, or the software that is consuming it).
+//
+// In particular, the prefixes "minknow:", "bream:", "protocol:" and "gui:" are reserved for MinKNOW
+// and the software that ships with MinKNOW. Names starting with ":" are also reserved for
+// "well-known" values that will be listed in this or related documentation.
+service KeyStoreService {
+    // Store one or more values.
+    //
+    // Anyone watching those values will be notified of the change. If they are watching several of
+    // the values in a single watch() call, all the updates will be sent in a single message.
+    rpc store (StoreRequest) returns (StoreResponse) {}
+
+    // Remove a value from the store.
+    rpc remove (RemoveRequest) returns (RemoveResponse) {}
+
+    // Get a single value.
+    //
+    // This is a convenient alternative to get() when you only want a single value. If you want
+    // multiple values, it is more efficient to request them all in a single get() call.
+    //
+    // If the requested value is not in the store, this will return an error.
+    rpc get_one (GetOneRequest) returns (GetOneResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Get any number of values.
+    rpc get (GetRequest) returns (GetResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Watch for values being updates.
+    //
+    // On calling this, you will get a message containing the current values, and then messages with
+    // updates as and when store() is called. The updates will only contain those values that
+    // changed.
+    rpc watch (WatchRequest) returns (stream WatchResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+}
+
+service LogService {
+    // Send a log message to any listeners of messages (see get_user_messages)
+    //
+    // Any historical user messages are first sent to the caller,
+    //
+    // Since 1.11
+    rpc send_user_message(SendUserMessageRequest) returns (SendUserMessageResponse) {}
+}
+
+service ManagerService {
+    // Get information about the machine running MinKNOW.
+    //
+    // This RPC can be called without providing any authentication tokens.
+    //
+    // Since 3.6
+    rpc describe_host (DescribeHostRequest) returns (DescribeHostResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // List all known positions where flow cells can be inserted.
+    //
+    // Provides a snapshot of places where users can insert flow cells. It has a streamed response
+    // in case there are too many positions to fit into a single response, but normally there should
+    // only be a single response.
+    //
+    // This RPC can be called without providing any authentication tokens.
+    //
+    // Since 3.6
+    rpc flow_cell_positions (FlowCellPositionsRequest) returns (stream FlowCellPositionsResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Current version information includes:
+    // - Minknow version
+    // - Protocols version (i.e. Bream-4 version)
+    // - Configuration version (i.e. Wanda version)
+    // - Distribution version
+    // - Guppy version
+    //
+    // This RPC can be called without providing any authentication tokens.
+    //
+    // See also: instance.get_version_info which provides some similar information on a per instance basis.
+    // Since 3.3
+    rpc get_version_info (GetVersionInfoRequest) returns (GetVersionInfoResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+}
+
+// Interface to control MinION (and MinION-like) devices.
+service MinionDeviceService {
+    // Change the settings for the active device.
+    //
+    // If you omit a parameter, that setting will not be changed.
+    //
+    // This call is atomic: either all the settings will be applied, or none of them (if there is an
+    // error).
+    rpc change_settings(ChangeSettingsRequest) returns (ChangeSettingsResponse) {
+        option idempotency_level = IDEMPOTENT;
+    }
+
+    // Get the current settings for the active device.
+    rpc get_settings(GetSettingsRequest) returns (GetSettingsResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+    // Get the rotational rate of the fan cooling the heat-sink. (Not available
+    // on all MinION platforms.)
+    rpc get_fan_speed(GetFanSpeedRequest) returns (GetFanSpeedResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+}
+
+service ProtocolService {
+    // Returns the name and run id of the currently running protocol.
+    //
+    // Will fail with FAILED_PRECONDITION if there is no protocol running
+    //
+    // Since 1.11
+    rpc get_current_protocol_run (GetCurrentProtocolRunRequest) returns (ProtocolRunInfo) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+}
+
