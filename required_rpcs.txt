@@ -114,6 +114,10 @@ service DeviceService {
     rpc get_calibration (GetCalibrationRequest) returns (GetCalibrationResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
+
+    rpc get_temperature (GetTemperatureRequest) returns (GetTemperatureResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
 }
 
 service InstanceService {

@@ -11,6 +11,8 @@
 use crate::services::minknow_api::device;
 use crate::services::minknow_api::device::device_service_server::DeviceService;
 use crate::services::minknow_api::device::get_flow_cell_info_response::TemperatureOffsetNullable;
+use crate::services::minknow_api::device::get_temperature_response::Temperature;
+use crate::services::minknow_api::device::get_temperature_response::MinIonTemperature;
 use tonic::{Request, Response, Status};
 
 #[derive(Debug)]
@@ -71,4 +73,15 @@ impl DeviceService for Device {
             insertion_script_status: 0,
         }))
     }
+   
+    async fn get_temperature(
+        &self,
+        _request: Request<device::GetTemperatureRequest>,
+    ) -> Result<Response<device::GetTemperatureResponse>, Status> {
+        return Ok(Response::new(device::GetTemperatureResponse {
+            temperature: Some(Temperature::Minion(MinIonTemperature{asic_temperature: Some(0.0), heatsink_temperature: Some(1.0)})),
+            target_temperature: Some(0.0),
+        }));
+    }
+    
 }
