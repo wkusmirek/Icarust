@@ -118,6 +118,17 @@ service DeviceService {
     rpc get_temperature (GetTemperatureRequest) returns (GetTemperatureResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
+
+    rpc get_bias_voltage (GetBiasVoltageRequest) returns (GetBiasVoltageResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
+}
+
+service StatisticsService {
+//    rpc get_flow_cell_info (GetFlowCellInfoRequest) returns (GetFlowCellInfoResponse) {
+//        option idempotency_level = NO_SIDE_EFFECTS;
+//    }
 }
 
 service InstanceService {

@@ -8,6 +8,7 @@
 //!     
 //!     Returns a tonne of information about the flowclel
 //!
+use rand::Rng;
 use crate::services::minknow_api::device;
 use crate::services::minknow_api::device::device_service_server::DeviceService;
 use crate::services::minknow_api::device::get_flow_cell_info_response::TemperatureOffsetNullable;
@@ -78,9 +79,20 @@ impl DeviceService for Device {
         &self,
         _request: Request<device::GetTemperatureRequest>,
     ) -> Result<Response<device::GetTemperatureResponse>, Status> {
+        let mut rng = rand::thread_rng();
         return Ok(Response::new(device::GetTemperatureResponse {
-            temperature: Some(Temperature::Minion(MinIonTemperature{asic_temperature: Some(0.0), heatsink_temperature: Some(1.0)})),
-            target_temperature: Some(0.0),
+            temperature: Some(Temperature::Minion(MinIonTemperature{asic_temperature: Some(rng.gen_range(26.0..31.0)), heatsink_temperature: Some(rng.gen_range(34.0..36.0))})),
+            target_temperature: Some(1.0),
+        }));
+    }
+    
+    async fn get_bias_voltage(
+        &self,
+        _request: Request<device::GetBiasVoltageRequest>,
+    ) -> Result<Response<device::GetBiasVoltageResponse>, Status> {
+        let mut rng = rand::thread_rng();
+        return Ok(Response::new(device::GetBiasVoltageResponse {
+            bias_voltage: rng.gen_range(26.0..31.0),
         }));
     }
     

@@ -9,6 +9,7 @@ import "minknow_api/acquisition.proto";
 import "minknow_api/rpc_options.proto";
 
 service StatisticsService {
+/*
     // Tracks how much time has been spent in each channel state, aggregated across all the channels
     //
     // Since 4.0
@@ -71,7 +72,7 @@ service StatisticsService {
     rpc stream_bias_voltages (StreamBiasVoltagesRequest) returns (stream StreamBiasVoltagesResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
-
+*/
     // A histogram of read lengths
     //
     // If the experiment is in-progress, then the latest histogram is streamed on a regular basis
@@ -81,7 +82,7 @@ service StatisticsService {
     rpc stream_read_length_histogram (StreamReadLengthHistogramRequest) returns (stream StreamReadLengthHistogramResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
-
+/*
     // Gets a list of the types of read-length values for which a histogram is available
     //
     // Since 3.2
@@ -111,6 +112,7 @@ service StatisticsService {
     rpc stream_basecall_boxplots (StreamBoxplotRequest) returns (stream BoxplotResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
+*/
 }
 
 // Specify a desired data selection.

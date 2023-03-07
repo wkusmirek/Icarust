@@ -50,6 +50,10 @@ service DataService {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
 
+    rpc get_channel_states (GetChannelStatesRequest) returns (GetChannelStatesResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
+
 }
 
 message GetChannelStatesRequest {

@@ -2,6 +2,7 @@ pub mod acquisition;
 pub mod analysis_configuration;
 pub mod data;
 pub mod device;
+pub mod statistics;
 pub mod instance;
 pub mod log;
 pub mod manager;

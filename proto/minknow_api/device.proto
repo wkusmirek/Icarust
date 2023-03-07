@@ -38,6 +38,10 @@ service DeviceService {
     rpc get_temperature (GetTemperatureRequest) returns (GetTemperatureResponse) {
         option idempotency_level = NO_SIDE_EFFECTS;
     }
+
+    rpc get_bias_voltage (GetBiasVoltageRequest) returns (GetBiasVoltageResponse) {
+        option idempotency_level = NO_SIDE_EFFECTS;
+    }
 }
 
 

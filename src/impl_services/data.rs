@@ -38,6 +38,7 @@ use rand_distr::{Distribution, SkewNormal};
 use serde::Deserialize;
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
+use rand::seq::SliceRandom;
 
 use crate::cli::Cli;
 use crate::reacquisition_distribution::{ReacquisitionPoisson, SampleDist};
@@ -46,9 +47,13 @@ use crate::services::minknow_api::data::data_service_server::DataService;
 use crate::services::minknow_api::data::get_data_types_response::DataType;
 use crate::services::minknow_api::data::get_live_reads_request::action;
 use crate::services::minknow_api::data::get_live_reads_response::ReadData;
+use crate::services::minknow_api::data::get_channel_states_response::ChannelStateData;
+use crate::services::minknow_api::data::get_channel_states_response::channel_state_data::State;
+use crate::services::minknow_api::device::ReturnedChannelConfiguration;
 use crate::services::minknow_api::data::{
     get_live_reads_request, get_live_reads_response, GetDataTypesRequest, GetDataTypesResponse,
     GetLiveReadsRequest, GetLiveReadsResponse,
+    get_channel_states_response, GetChannelStatesRequest, GetChannelStatesResponse,
 };
 use crate::{Config, Sample, _load_toml};
 
@@ -1312,6 +1317,31 @@ impl DataService for DataServiceServicer {
                 big_endian: false,
                 size: 2,
             }),
+        }))
+    }
+
+    async fn get_channel_states(
+        &self,
+        _request: Request<GetChannelStatesRequest>,
+    ) -> Result<Response<GetChannelStatesResponse>, Status> {
+        let mut channel_states: Vec<ChannelStateData> = vec![];
+        let mut rng = rand::thread_rng();
+        let states = vec!["above", "adapter", "below", "good_single", "strand", "inrange", "multiple", "pending_mux_change", "saturated", "unavailable", "unblocking", "unclassified", "unknown"];
+        for n in 1..3001 { // TODO - number of pores
+                let state = states.choose(&mut rng).unwrap();
+        	channel_states.push(ChannelStateData{
+            		channel: n,
+            		state: Some(State::StateName(state.to_string())),
+            		acquisition_raw_index: 1,
+                       analysis_raw_index: 1,
+                       trigger_time: 1,
+                       config: Some(ReturnedChannelConfiguration{test_current: false,
+                                                                 unblock: false,
+                                                                 well: 123}),
+        	});
+        }
+        Ok(Response::new(GetChannelStatesResponse {
+            channel_states: channel_states
         }))
     }
 }

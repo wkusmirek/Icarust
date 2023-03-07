@@ -37,6 +37,7 @@ use crate::impl_services::acquisition::Acquisition;
 use crate::impl_services::analysis_configuration::Analysis;
 use crate::impl_services::data::DataServiceServicer;
 use crate::impl_services::device::Device;
+use crate::impl_services::statistics::Statistics;
 use crate::impl_services::instance::Instance;
 use crate::impl_services::log::Log;
 use crate::impl_services::manager::Manager;
@@ -46,6 +47,7 @@ use crate::services::minknow_api::acquisition::acquisition_service_server::Acqui
 use crate::services::minknow_api::analysis_configuration::analysis_configuration_service_server::AnalysisConfigurationServiceServer;
 use crate::services::minknow_api::data::data_service_server::DataServiceServer;
 use crate::services::minknow_api::device::device_service_server::DeviceServiceServer;
+use crate::services::minknow_api::statistics::statistics_service_server::StatisticsServiceServer;
 use crate::services::minknow_api::instance::instance_service_server::InstanceServiceServer;
 use crate::services::minknow_api::log::log_service_server::LogServiceServer;
 use crate::services::minknow_api::manager::flow_cell_position::{RpcPorts, SharedHardwareGroup};
@@ -321,6 +323,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let instance_svc = InstanceServiceServer::new(Instance {});
     let analysis_svc = AnalysisConfigurationServiceServer::new(Analysis {});
     let device_svc = DeviceServiceServer::new(Device::new(channel_size));
+    let statistics_svc = StatisticsServiceServer::new(Statistics::new(channel_size));
     let acquisition_svc = AcquisitionServiceServer::new(Acquisition {
         run_id: run_id.clone(),
     });
@@ -341,6 +344,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .concurrency_limit_per_connection(256)
         .add_service(log_svc)
         .add_service(device_svc)
+        .add_service(statistics_svc)
         .add_service(instance_svc)
         .add_service(analysis_svc)
         .add_service(acquisition_svc)
