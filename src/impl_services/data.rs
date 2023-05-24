@@ -382,9 +382,9 @@ fn start_write_out_thread(
                     let mut multi = MultiFast5File::new(fast5_file_name.clone(), OpenMode::Append);
                     for to_write_info in read_infos.drain(..4000) {
                         // skip this read if we are trying to write it out twice
-                        if !read_numbers_seen.insert(to_write_info.read_id.clone()) {
+                        //if !read_numbers_seen.insert(to_write_info.read_id.clone()) {
                             continue;
-                        }
+                        //}
                         let mut new_end = to_write_info.read.len();
                         if to_write_info.was_unblocked {
                             let unblock_time = to_write_info.time_unblocked;
@@ -998,7 +998,7 @@ impl DataServiceServicer {
 
         let (views, dist) = process_samples_from_config(&config);
         let files: Vec<String> = views.keys().map(|z| z.clone()).collect();
-        let complete_read_tx = start_write_out_thread(run_id, cli_opts, output_path.clone());
+        //let complete_read_tx = start_write_out_thread(run_id, cli_opts, output_path.clone());
         let mut rng: StdRng = rand::SeedableRng::seed_from_u64(1234567);
 
         let starting_functional_pore_count =
@@ -1059,7 +1059,7 @@ impl DataServiceServicer {
                         if value.write_out {
 
                             completed_reads += 1;
-                            complete_read_tx.send(value.clone()).unwrap();
+                            //complete_read_tx.send(value.clone()).unwrap();
                             value.pause = r.sample(&mut rng);
                             // The potnetial chance to die
                             let potential_yolo_death =
