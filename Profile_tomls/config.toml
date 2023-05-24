@@ -1,4 +1,4 @@
-output_path = "/tmp/"
+output_path = "/dev/null/"
 target_yield = 100000000000
 working_pore_percent = 85
 
