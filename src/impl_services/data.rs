@@ -1328,7 +1328,24 @@ impl DataService for DataServiceServicer {
         let mut rng = rand::thread_rng();
         let states = vec!["above", "adapter", "below", "good_single", "strand", "inrange", "multiple", "pending_mux_change", "saturated", "unavailable", "unblocking", "unclassified", "unknown"];
         for n in 1..3001 { // TODO - number of pores
-                let state = states.choose(&mut rng).unwrap();
+                let mut state = states[0];
+                //let state = states.choose(&mut rng).unwrap();
+                if n < 1600 {
+                    state = states[4];
+                } else if n < 1700 {
+                    state = states[1];
+                } else if n < 1780 {
+                    state = states[9];
+                } else if n < 2000 {
+                    state = states[10];
+                } else if n < 2100 {
+                    state = states[11];
+                } else if n < 2150 {
+                    state = states[0];
+                } else {
+                    state = states.choose(&mut rng).unwrap();
+                }
+                
         	channel_states.push(ChannelStateData{
             		channel: n,
             		state: Some(State::StateName(state.to_string())),
