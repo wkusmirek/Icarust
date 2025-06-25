@@ -6,7 +6,7 @@ sample_name = "test"
 experiment_name = "test_mpv"
 flowcell_name = "FAQ1234"
 experiment_duration_set = 4800
-device_id = "Bantersaurus"
+device_id = "PAW07331"
 position = "FenceSitter"
 
 [[sample]]

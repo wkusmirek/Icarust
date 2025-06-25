@@ -326,7 +326,7 @@ fn start_write_out_thread(
             ),
             ("bream_is_standard", "0"),
             ("configuration_version", "4.4.13"),
-            ("device_id", "Bantersaurus"),
+            ("device_id", "PAW07331"),
             ("device_type", config.parameters.position.as_str()),
             ("distribution_status", "stable"),
             ("distribution_version", "21.10.8"),
