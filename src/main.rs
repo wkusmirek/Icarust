@@ -165,6 +165,8 @@ impl Config {
 
 #[derive(Deserialize, Debug, Clone)]
 struct Parameters {
+    manager_port: f64,
+    position_port: f64,
     sample_name: String,
     experiment_name: String,
     flowcell_name: String,
@@ -243,14 +245,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut software_config = Ini::new();
     software_config.load("config.ini")?;
 
-    let m_port = software_config
-        .getint("PORTS", "manager")
-        .unwrap()
-        .expect("Error reading config manager port.");
-    let a_port = software_config
-        .getint("PORTS", "position")
-        .unwrap()
-        .expect("Error reading config position port.");
+    //let m_port = software_config
+    //    .getint("PORTS", "manager")
+    //    .unwrap()
+    //    .expect("Error reading config manager port.");
+    //let a_port = software_config
+    //    .getint("PORTS", "position")
+    //    .unwrap()
+    //    .expect("Error reading config position port.");
+    let m_port = config.parameters.manager_port.clone();
+    let a_port = config.parameters.position_port.clone();
     let tls_cert_path = PathBuf::from(
         software_config
             .get("TLS", "cert-dir")

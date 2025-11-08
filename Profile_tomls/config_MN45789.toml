@@ -3,11 +3,13 @@ target_yield = 100000000000
 working_pore_percent = 85
 
 [parameters]
+manager_port = 9502
+position_port = 10001
 sample_name = "test"
 experiment_name = "test_2_bacteria"
 flowcell_name = "FAQ1234"
 experiment_duration_set = 4800
-device_id = "PAW07331"
+device_id = "MN45789"
 position = "FenceSitter"
 
 [[sample]]
